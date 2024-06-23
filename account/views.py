@@ -2,9 +2,9 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from account.serializers import *
+from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer, UserChangepasswordSerializer, SendPasswordResetEmilSerializer, UserPasswordResetSerializer, UserSerializer
 from django.contrib.auth import authenticate
-from account.renderers import *
+from .renderers import userRenderer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User

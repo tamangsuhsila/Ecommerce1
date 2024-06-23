@@ -14,7 +14,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'password':{'write_only':True}
         }
     
-# validate method /to validating pasword and confirmed password while registration
+# validate method /to validating password and confirmed password while registration
     def validate(self, data):
         password=data.get('password')
         password2=data.get('password2')
@@ -54,6 +54,8 @@ class UserChangepasswordSerializer(serializers.Serializer):
         user.set_password(password)
         user.save()
         return super().validate(data)
+    # just validation save create funcyionma garni
+    
         
         
 class SendPasswordResetEmilSerializer(serializers.Serializer):
