@@ -105,7 +105,8 @@ class UserPasswordResetSerializer(serializers.Serializer):
             except DjangoUnicodeDecodeError:
                 PasswordResetTokenGenerator().check_token(user,token)
                 raise serializers.ValidationError('Token is not valid or Expired')
-                
+        
+        
         
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

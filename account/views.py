@@ -82,9 +82,6 @@ class UserPasswordResetView(APIView):
         return Response(serializer.errors, status=status. HTTP_400_BAD_REQUEST)
 
 
-
-
-
 class UserView(APIView):
     renderer_classes = [userRenderer]
     permission_classes = [IsAuthenticated]
