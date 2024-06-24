@@ -17,6 +17,13 @@ class BranchListCreateView(generics.ListCreateAPIView):
         Branches = get_object_or_404(Branch, pk=pk)
         Branches.delete()
         return Response({ 'message':'Branch deleted successfully'})
+    
+    def post(self, request, pk=None):
+        serializer = BranchSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
             
         
 # class BranchDeleteView(generics.ListCreateAPIView):

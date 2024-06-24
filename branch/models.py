@@ -5,7 +5,7 @@ from django.db import models
 class Branch(models.Model):
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=255)
-    phone_number = models.IntegerField(blank=True, null=True)
+    phone_number = models.IntegerField()
     image = models.ImageField(upload_to='static/branch', blank=True)
     is_active = models.BooleanField(default=True)
     

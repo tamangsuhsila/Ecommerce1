@@ -23,4 +23,11 @@ class PostViewSet(viewsets.ModelViewSet):
         Posts = get_object_or_404(Post, pk=pk)
         Posts.delete()
         return Response({ 'message':'Post deleted successfully'})
+    
+    def post(self, request, pk=None):
+        serializer = PostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
 

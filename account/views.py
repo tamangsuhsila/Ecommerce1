@@ -51,6 +51,11 @@ class UserProfileView(APIView):
     def get(self, request, format=None): 
         serializer=UserProfileSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def delete(self, request, format=None):
+        user = request.user
+        user.delete()
+        return Response({'message':'User deleted successfully'}, status=status.HTTP_200_OK)
 
 class UserChangePasswordView(APIView):
     renderer_classes = [userRenderer]
@@ -98,6 +103,8 @@ class UserView(APIView):
             users = User.objects.all()
             serializer = UserSerializer(users, many=True)
             return Response(serializer.data)
+        
+    
 
 
 
