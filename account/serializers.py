@@ -22,6 +22,10 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         password2=data.get('password2')
         if password!=password2:
             raise serializers.ValidationError("password and confirmed password doesn't match")
+        
+        contactnumber = data.get('contactnumber')
+        if len(str(contactnumber)) != 10:
+            raise serializers.ValidationError("Contact number must be 10 digit")
         return data
 
     def create(self, validate_data):
