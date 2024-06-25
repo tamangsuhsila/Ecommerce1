@@ -4,6 +4,8 @@ from django.utils.encoding import smart_str, force_bytes, DjangoUnicodeDecodeErr
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from .utils import Util
+
+
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password2=serializers.CharField(style={'input_type':'password'},write_only=True)
     
@@ -20,6 +22,10 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         password2=data.get('password2')
         if password!=password2:
             raise serializers.ValidationError("password and confirmed password doesn't match")
+        
+        contactnumber = data.get('contactnumber')
+        if len(str(contactnumber)) != 10:
+            raise serializers.ValidationError("Contact number must be 10 digit")
         return data
 
     def create(self, validate_data):
@@ -33,30 +39,24 @@ class UserLoginSerializer(serializers.ModelSerializer):
         fields = ['email','password']
         
     
+    
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model=User
         fields=['email','password']
-
-      
+        
 class UserChangepasswordSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=255, style={'input_type':'password'}, write_only=True)
     password2 = serializers.CharField(max_length=255, style={'input_type':'password'}, write_only=True)
     class Meta:
         fields = ['password', 'password2']
-        
+    
     def validate(self, data):
         password = data.get('password')
         password2 = data.get('password2')
-        user = self.context.get('user')
-        if password!=password2:
+        if password != password2:
             raise serializers.ValidationError("password and confirmed password doesn't match")
-        user.set_password(password)
-        user.save()
-        return super().validate(data)
-    # just validation save create funcyionma garni
-    
-        
+        return data
         
 class SendPasswordResetEmilSerializer(serializers.Serializer):
     email=serializers.EmailField(max_length=255)
@@ -106,10 +106,11 @@ class UserPasswordResetSerializer(serializers.Serializer):
                 user.set_password(password)
                 user.save()
                 return data
-            except DjangoUnicodeDecodeError as identifier:
+            except DjangoUnicodeDecodeError:
                 PasswordResetTokenGenerator().check_token(user,token)
                 raise serializers.ValidationError('Token is not valid or Expired')
-                
+        
+        
         
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

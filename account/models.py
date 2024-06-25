@@ -46,7 +46,7 @@ class User(AbstractBaseUser):
     lastname=models.CharField(max_length=50)
     email = models.EmailField(verbose_name='Email',max_length=255,unique=True,)
     address = models.CharField(max_length=100)
-    contactnumber=models.CharField(max_length=10)
+    contactnumber=models.IntegerField()
     password=models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)

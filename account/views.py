@@ -1,4 +1,3 @@
-
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -7,7 +6,7 @@ from django.contrib.auth import authenticate
 from .renderers import userRenderer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth.models import User
+from account.models import User
 # generate token manually
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -22,11 +21,16 @@ class UserRegistrationView(APIView):
     renderer_classes=[userRenderer]
     def post(self, request, format=None):
         serializer=UserRegistrationSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
+        
+        if User.objects.filter(email=request.data.get('email')).exists():
+            return Response({'message':'User with this email already exists.'},status=status. HTTP_409_CONFLICT)
+        
+        elif serializer.is_valid():
             user=serializer.save()
             token = get_tokens_for_user(user)
-            return Response({ 'token':token,'messege':'Registration Successful'},
+            return Response({ 'token':token,'message':'Registration Successful'},
             status=status.HTTP_201_CREATED)
+    
         return Response(serializer.errors, status=status. HTTP_400_BAD_REQUEST)
 
 class UserLoginView(APIView):
@@ -40,10 +44,10 @@ class UserLoginView(APIView):
             user=authenticate(email=email, password=password)
             if user:
                 token = get_tokens_for_user(user)
-                return Response({'token':token,'messege':'Login Success'},status=status.HTTP_200_OK)
+                return Response({'token':token,'message':'Login Success'},status=status.HTTP_200_OK)
             else:
                 return Response({'errors':{'non_field_errors':['email or password is not valid']}}, status=status.HTTP_404_NOT_FOUND)
-       
+            
 # for detail about userprofile
 class UserProfileView(APIView):
     renderer_classes= [userRenderer]
@@ -51,16 +55,22 @@ class UserProfileView(APIView):
     def get(self, request, format=None): 
         serializer=UserProfileSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
+    
+    def delete(self, request, format=None):
+        user = request.user
+        user.delete()
+        return Response({'message':'User deleted successfully'}, status=status.HTTP_200_OK)
 
 class UserChangePasswordView(APIView):
     renderer_classes = [userRenderer]
     permission_classes = [IsAuthenticated]
     def post(self, request, format=None):
-        serializer = UserChangepasswordSerializer(data=request.data,
-        context={'user':request.user})
+        serializer = UserChangepasswordSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-         return Response({'messege':'Password Changed Successfully'},status=status.HTTP_200_OK)
+            user = request.user
+            user.set_password(serializer.data.get('password'))
+            user.save()
+            return Response({'message':'Password Changed Successfully'},status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status. HTTP_400_BAD_REQUEST)
 
 class SendPasswordResetEmailView(APIView):
@@ -81,12 +91,9 @@ class UserPasswordResetView(APIView):
         return Response(serializer.errors, status=status. HTTP_400_BAD_REQUEST)
 
 
-
-
-
 class UserView(APIView):
     renderer_classes = [userRenderer]
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request, pk=None):
         if pk:
@@ -100,6 +107,8 @@ class UserView(APIView):
             users = User.objects.all()
             serializer = UserSerializer(users, many=True)
             return Response(serializer.data)
+        
+    
 
 
 
