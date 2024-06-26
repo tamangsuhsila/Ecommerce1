@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='branch',
             name='phone_number',
-            field=models.IntegerField(blank=True, null=True),
+            field=models.IntegerField(),
         ),
     ]
