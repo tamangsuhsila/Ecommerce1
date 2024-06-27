@@ -21,8 +21,8 @@ class PostSerializer(serializers.ModelSerializer):
         publish = data.get('publish')
         
         if image:
-            if image.size> 2*1024*1024:
-                raise serializers.ValidationError("Image is too large.Maximum size is 2MB")
+            # if image.size> 2*1024*1024:
+            #     raise serializers.ValidationError("Image is too large.Maximum size is 2MB")
             if not image.name.endswith(('png','jpg','jpeg')):
                 raise serializers.ValidationError("Image is not in correct format")
         
