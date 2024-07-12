@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-484uutwyc=ffg45ywl#l=$rzzu^xs1t&kil1+@olwnix3gng*#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.1.80']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.1.80','*']
 
 
 # Application definition
@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'blog',
     'branch',
     'product',
+    'cart'
 
 ]
 
@@ -180,8 +181,9 @@ SIMPLE_JWT = {
 PASSWORD_RESET_TIMEOUT=900
 
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-    "http://localhost:5173", "http://127.0.0.1:5173", "http://192.168.1.82:5173",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:8000",
+#     "http://127.0.0.1:8000",
+#     "http://localhost:5173", "http://127.0.0.1:5173", "http://192.168.1.82:5173",
+# ]
+CORS_ALLOWED_ORIGINS_ALL = True

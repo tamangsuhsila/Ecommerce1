@@ -1,7 +1,7 @@
 
 from product.serializers import ProductSerializer, CategorySerializer, VariantSerializer, VendorSerializer
 from rest_framework import viewsets
-from product.models import product, Category, ProductVariant, ProductVariantType, vendor, ProductVendor
+from product.models import Product, Category, ProductVariant, Vendor
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 
@@ -10,15 +10,15 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = product.objects.all()
+    queryset = Product.objects.all()
     serializer_class = ProductSerializer
     
     def get_queryset(self):
-        category = self.request.query_params.get('category', None)
+        category = self.request.query_params.get('Category', None)
         if category:
-            queryset = product.objects.filter(category__category_name=category)
+            queryset = Product.objects.filter(category__category_name=category)
         else:
-            queryset = product.objects.all()
+            queryset = Product.objects.all()
         return queryset
     
     def list(self, request, *args, **kwargs):
@@ -28,8 +28,8 @@ class ProductViewSet(viewsets.ModelViewSet):
     
     def delete(self, request, pk= None):
         pk = request.data.get('id')
-        Products = get_object_or_404(product, pk=pk)
-        Products.delete()
+        products = get_object_or_404(Product, pk=pk)
+        products.delete()
         return Response({ 'message':'Product deleted successfully'})
 
 class VariantViewSet(viewsets.ModelViewSet):
@@ -38,12 +38,12 @@ class VariantViewSet(viewsets.ModelViewSet):
     
 class VendorViewSet(viewsets.ModelViewSet):
     serializer_class = VendorSerializer
-    queryset = vendor.objects.all()
+    queryset = Vendor.objects.all()
     
     
 
     
-    
+
 
     
 
