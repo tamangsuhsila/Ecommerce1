@@ -34,7 +34,6 @@ class Product(models.Model):
     price=models.DecimalField(default=0, decimal_places=2, max_digits=1000)
     image=models.ImageField(upload_to='static/product',blank=True)
     variant_type = models.ForeignKey(ProductVariantType, on_delete=models.PROTECT)
-    
     discount = models.IntegerField()
     
     def __str__(self):

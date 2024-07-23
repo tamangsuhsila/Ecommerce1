@@ -1,4 +1,3 @@
-
 from product.serializers import ProductSerializer, CategorySerializer, VariantSerializer, VendorSerializer
 from rest_framework import viewsets
 from product.models import Product, Category, ProductVariant, Vendor
