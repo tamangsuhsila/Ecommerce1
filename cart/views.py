@@ -4,6 +4,7 @@ from product.models import Product
 from .models import Cart, CartItem
 from  .serializers import CartSerializer, CartItemSerializer
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import status   
 
 class CartViewSet(viewsets.ModelViewSet):
     queryset = Cart.objects.all()
@@ -17,30 +18,55 @@ class CartViewSet(viewsets.ModelViewSet):
         serializer = CartItemSerializer(queryset, many=True)
         return Response(serializer.data)
     
-    def create(self, request, *args, **kwargs):
-        data = request.data
+    def post(self, request, *args, **kwargs):
         user = request.user
-        cart, created= Cart.objects.get_or_create(user=user, order=False)
-        product = Product.objects.get(id=data.get('product'))
-        price = product.price
-        quantity = data.get('quantity')
-        cart_items= CartItem(cart=cart, user=user, product=product, price=price, quantity=quantity)
-        cart_items.save()
-        return Response({'message': 'Item added to cart'})
+        cart, created = Cart.objects.get_or_create(user=user, order=False)
+        
+        serializer = CartSerializer(cart)
+        return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
     
     def delete(self, request, *args, **kwargs):
         user = request.user
-        data = request.data
-        cart_item = CartItem.objects.get(id=data.get('id'))
-        cart_item.delete()
         cart = Cart.objects.filter(user=user, order=False).first()
-        return Response({'message': 'Item removed from cart'})
+        
+        if cart:
+            cart.delete()
+            return Response({'message': 'Cart deleted successfully'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'No cart found'}, status=status.HTTP_404_NOT_FOUND)
+
     
-    def put(self, request, *args, **kwargs):
-        data= request.data
-        cart_item = CartItem.objects.get(id=data.get('id'))
-        quantity = data.get('quantity')
-        cart_item.quantity += quantity
-        cart_item.save()
-        return Response({'message': 'Item quantity updated'})
+
+class CartItemViewSet(viewsets.ModelViewSet):
+    queryset = CartItem.objects.all()
+    serializer_class = CartItemSerializer
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request):
+        user = request.user
+        cart = Cart.objects.filter(user=user, order=False).first()
+        
+        if not cart:
+            return Response({"error": "No active cart found for user"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        product_id = request.data.get('product')
+        quantity = request.data.get('quantity')
+
+        if not product_id or not quantity:
+            return Response({"error": "Product and quantity are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            quantity = int(quantity)
+        except ValueError:
+            return Response({"error": "Quantity must be an integer"}, status=status.HTTP_400_BAD_REQUEST)
+
+        cart_item = CartItem.objects.create(cart=cart, user=user, product=product, quantity=quantity)
+        serializer = CartItemSerializer(cart_item)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
     
